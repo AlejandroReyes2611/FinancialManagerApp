@@ -9,3 +9,4 @@ import 'react-native-gesture-handler';
 import 'react-native-get-random-values';
 
 AppRegistry.registerComponent(appName, () => App);
+console.disableYellowBox = true;

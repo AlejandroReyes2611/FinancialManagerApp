@@ -1,48 +1,62 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Switch } from 'react-native';
 import { Input, Button } from 'react-native-elements';
+import { Picker } from "@react-native-picker/picker";
 
+const CATEGORIES = [
+    { id: 'food', name: 'Alimentos' },
+    { id: 'transport', name: 'Transporte' },
+    { id: 'entertainment', name: 'Entretenimiento' },
+];
 
 const AddTransactionsScreen = ({ navigation, route }) => {
-
     const { transaction } = route.params || {};
 
-    const [description, setDescription] = useState('');
-    const [amount, setAmount] = useState('');
+    const [description, setDescription] = useState(transaction ? transaction.description : '');
+    const [amount, setAmount] = useState(transaction ? String(transaction.amount) : '');
+    const [categoryId, setCategoryId] = useState(transaction ? transaction.categoryId : CATEGORIES[0].id);
+    const [isIncome, setIsIncome] = useState(true);
 
     let transactionCounter = 0;
 
     const handleSave = async () => {
+        if (!description.trim()) {
+            alert('Por favor, introduce una descripción.');
+            return;
+        }
+
+        const parsedAmount = parseFloat(amount);
+        if (!amount.trim() || isNaN(parsedAmount)) {
+            alert('Por favor, introduce un monto válido.');
+            return;
+        }
+
         try {
+            const currentTransactions = JSON.parse(await AsyncStorage.getItem('transactions')) || [];
+            
+            const finalAmount = isIncome ? Math.abs(parsedAmount) : -Math.abs(parsedAmount);
+
             const newTransaction = {
-                id: `${new Date().toISOString()}-${transactionCounter++}`,
-                description: description,
-                amount: parseFloat(amount),
+                id: transaction ? transaction.id : `${new Date().toISOString()}-${transactionCounter++}`,
+                description,
+                amount: finalAmount,
+                categoryId
             };
 
-            let storedTransactions = JSON.parse(await AsyncStorage.getItem('transactions')) || [];
-            
-            // Check for duplicate IDs
-            if (storedTransactions.some(t => t.id === newTransaction.id)) {
-                console.warn("Intentando guardar una transacción con un ID duplicado:", newTransaction.id);
-                return;
-            }
-
-            if (route.params?.transaction) {
-                const index = storedTransactions.findIndex(t => t.id === route.params.transaction.id);
-                storedTransactions[index] = newTransaction;
+            if (transaction) {
+                const index = currentTransactions.findIndex(t => t.id === transaction.id);
+                currentTransactions[index] = newTransaction;
             } else {
-                storedTransactions.push(newTransaction);
+                currentTransactions.push(newTransaction);
             }
 
-            await AsyncStorage.setItem('transactions', JSON.stringify(storedTransactions));
+            await AsyncStorage.setItem('transactions', JSON.stringify(currentTransactions));
             navigation.goBack();
         } catch (error) {
             console.error('Error al guardar la transacción:', error);
         }
     };
-
 
     return (
         <View style={styles.container}>
@@ -59,7 +73,22 @@ const AddTransactionsScreen = ({ navigation, route }) => {
                 keyboardType="numeric"
                 style={styles.input}
             />
-            <Button title="Guardar Transacción" onPress={handleSave} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+                <Text>Gasto</Text>
+                <Switch
+                    value={isIncome}
+                    onValueChange={(value) => setIsIncome(value)}
+                />
+                <Text>Ingreso</Text>
+            </View>
+            <Picker
+                selectedValue={categoryId}
+                onValueChange={(itemValue) => setCategoryId(itemValue)}>
+                {CATEGORIES.map((category) => (
+                    <Picker.Item style={{ color: '#000' }} key={category.id} label={category.name} value={category.id} />
+                ))}
+            </Picker>
+            <Button title="Guardar" onPress={handleSave} />
         </View>
     );
 };
