@@ -1721,6 +1721,15 @@
   "resolved" "https://registry.npmjs.org/@react-native/polyfills/-/polyfills-2.0.0.tgz"
   "version" "2.0.0"
 
+"@react-navigation/bottom-tabs@^6.5.10":
+  "integrity" "sha512-ApK1CNoOy6vqhtfJf0kbiNoLGxlazKpZWvRhH9OInz61PXuJ5AIr4PKIW/FhIZ7DQgnIleDvubjgSGnO+VColw=="
+  "resolved" "https://registry.npmjs.org/@react-navigation/bottom-tabs/-/bottom-tabs-6.5.10.tgz"
+  "version" "6.5.10"
+  dependencies:
+    "@react-navigation/elements" "^1.3.20"
+    "color" "^4.2.3"
+    "warn-once" "^0.1.0"
+
 "@react-navigation/core@^6.4.9":
   "integrity" "sha512-G9GH7bP9x0qqupxZnkSftnkn4JoXancElTvFc8FVGfEvxnxP+gBo3wqcknyBi7M5Vad4qecsYjCOa9wqsftv9g=="
   "resolved" "https://registry.npmjs.org/@react-navigation/core/-/core-6.4.9.tgz"
@@ -1733,10 +1742,10 @@
     "react-is" "^16.13.0"
     "use-latest-callback" "^0.1.5"
 
-"@react-navigation/elements@^1.3.19":
-  "integrity" "sha512-7hLvSYKPuDS070pza5gd43WDX7QgfuEmuTWNbCJhKdWlLudYmq3qzxGCBwCfO2dEI6+p8tla5wruaWiGKAbTYw=="
-  "resolved" "https://registry.npmjs.org/@react-navigation/elements/-/elements-1.3.19.tgz"
-  "version" "1.3.19"
+"@react-navigation/elements@^1.3.19", "@react-navigation/elements@^1.3.20":
+  "integrity" "sha512-/9YT9tp1R4ejXt+5cqcQnShTIv790sAAxeqizF1zLnSldmbHmb2kxxbCW6UhyhqRnTLF3UFpZwwgy4A8AP/MzA=="
+  "resolved" "https://registry.npmjs.org/@react-navigation/elements/-/elements-1.3.20.tgz"
+  "version" "1.3.20"
 
 "@react-navigation/native@^6.0.0", "@react-navigation/native@^6.1.8":
   "integrity" "sha512-0alti852nV+8oCVm9H80G6kZvrHoy51+rXBvVCRUs2rNDDozC/xPZs8tyeCJkqdw3cpxZDK8ndXF22uWq28+0Q=="
@@ -6414,10 +6423,10 @@
     "react-native-ratings" "8.0.4"
     "react-native-size-matters" "^0.3.1"
 
-"react-native-gesture-handler@^2.13.1", "react-native-gesture-handler@>= 1.0.0":
-  "integrity" "sha512-hW454X7sjuiBN+lobqw63pmT3boAmTl5OP6zQLq83iEe4T6PcHZ9lxzgCrebtgmutY8cJfq9rM2dOUVh9WBcww=="
-  "resolved" "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-2.13.1.tgz"
-  "version" "2.13.1"
+"react-native-gesture-handler@^2.13.3", "react-native-gesture-handler@>= 1.0.0":
+  "integrity" "sha512-6sNXtmRfYxQWgH0TjQX03QQ4UfCyM8jX1Ee1jXc3uNgefk03qapGGxZ2noXodGWKHzpsqMxB0O1lFLGew0GRrw=="
+  "resolved" "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-2.13.3.tgz"
+  "version" "2.13.3"
   dependencies:
     "@egjs/hammerjs" "^2.0.17"
     "hoist-non-react-statics" "^3.3.0"
@@ -6475,7 +6484,7 @@
     "css-select" "^5.1.0"
     "css-tree" "^1.1.3"
 
-"react-native-vector-icons@>7.0.0":
+"react-native-vector-icons@^10.0.0", "react-native-vector-icons@>7.0.0":
   "integrity" "sha512-efMOVbZIebY8RszZPzPBoXi9pvD/NFYmjIDYxRoc9LYSzV8rMJtT8FfcO2hPu85Rn2x9xktha0+qn0B7EqMAcQ=="
   "resolved" "https://registry.npmjs.org/react-native-vector-icons/-/react-native-vector-icons-10.0.0.tgz"
   "version" "10.0.0"

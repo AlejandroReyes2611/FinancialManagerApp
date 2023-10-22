@@ -7,12 +7,14 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { Picker } from "@react-native-picker/picker";
 import { BarChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
+import AddCategodryModal from "../components/AddCategoryModal";
 
 const CATEGORIES = [
     { id: 'all', name: 'Todas' },
     { id: 'food', name: 'Alimentos' },
     { id: 'transport', name: 'Transporte' },
     { id: 'entertainment', name: 'Entretenimiento' },
+    { id: 'Pay', name: 'Pago' },
 ]
 
 const TRANSACTION_TYPES = [
@@ -26,8 +28,16 @@ const HomeScreen = ({ navigation }) => {
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [selectedType, setSelectedType] = useState('all');
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [userCategories, setUserCategories] = useState([]);
     const isFocused = useIsFocused();
     const isMounted = useRef(true);
+
+    const handleAddCategory = async(categoryName) => {
+        const newCategory = { id: categoryName.toLoweCase(), name: categoryName };
+        CATEGORIES.push(newCategory);
+        await AsyncStorage.setItem('categories', JSON.stringify(CATEGORIES));
+    }
 
     const barData = {
         labels: CATEGORIES.filter(c => c.id !== 'all').map(c => c.name),
@@ -36,6 +46,14 @@ const HomeScreen = ({ navigation }) => {
                 return transactions.filter(t => t.categoryId === category.id).reduce((acc, t) => acc + t.amount, 0);
             })
         }]
+    };
+
+    const getColorForValue = (value, opacity) => {
+        if (value < 0) {
+            return `rgba(255, 0, 0, ${opacity})`; 
+        } else {
+            return `rgba(26, 255, 146, ${opacity})`;
+        }
     };
 
     useEffect(() => {
@@ -53,6 +71,16 @@ const HomeScreen = ({ navigation }) => {
 
         fetchTransactions();
     }, [selectedCategory, selectedType, isFocused]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            const storedCategories = JSON.parse(await AsyncStorage.getItem('categories')) || [];
+            setUserCategories(storedCategories);
+        };
+    
+        fetchCategories();
+    }, []);
+    
 
     getCategoryName = (id) => {
         const category = CATEGORIES.find(cat => cat.id === id);
@@ -120,10 +148,32 @@ const HomeScreen = ({ navigation }) => {
         );
     }
 
+    const deleteAllTransactions = async () => {
+        Alert.alert(
+            "Eliminar todas las transacciones",
+            "¿Estás seguro de que quieres eliminar todas las transacciones?",
+            [
+                {
+                    text: "Cancelar",
+                    style: "cancel",
+                },
+                {
+                    text: "Eliminar", onPress: async () => {
+                        setTransactions([]);
+                        setFilteredTransactions([]);
+                        await AsyncStorage.setItem('transactions', JSON.stringify([]));
+                    }
+                }
+            ]
+        );
+    };
+
+    const allCategories = [...CATEGORIES, ...userCategories];
     return (
+        
 
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            
+
             <View style={styles.container}>
                 <Text style={styles.title}>Tipo de Transacción:</Text>
                 <Picker
@@ -134,7 +184,13 @@ const HomeScreen = ({ navigation }) => {
                         <Picker.Item style={{ color: '#000' }} key={type.id} label={type.name} value={type.id} />
                     ))}
                 </Picker>
-                <Text style={styles.title}>Categorias</Text>                
+                <Button title="Agregar Categoría" onPress={() => setIsModalVisible(true)}/>
+                <AddCategodryModal
+                    isVisible={isModalVisible}
+                    onClose={() => setIsModalVisible(false)}
+                    onAdd={handleAddCategory}
+                />
+                <Text style={styles.title}>Categorias</Text>
                 <FlatList
                     data={filteredTransactions}
                     keyExtractor={(item) => item.id}
@@ -144,7 +200,7 @@ const HomeScreen = ({ navigation }) => {
                                 selectedValue={selectedCategory}
                                 onValueChange={(itemValue) => setSelectedCategory(itemValue)}
                             >
-                                {CATEGORIES.map((category) => (
+                                {allCategories.map((category) => (
                                     <Picker.Item style={{ color: '#000' }} key={category.id} label={category.name} value={category.id} />
                                 ))}
                             </Picker>
@@ -163,7 +219,7 @@ const HomeScreen = ({ navigation }) => {
                                         backgroundColor: '#FFFFFF',
                                         backgroundGradientFrom: '#FFFFFF',
                                         backgroundGradientTo: '#FFFFFF',
-                                        color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
+                                        color: (opacity = 1, value) => getColorForValue(value, opacity),
                                         strokeWidth: 2,
                                         barPercentage: 0.5,
                                     }}
@@ -175,13 +231,17 @@ const HomeScreen = ({ navigation }) => {
                             </View>
 
                             <Button title="Agregar Transacción" onPress={() => navigation.navigate('AddTransactionsScreen')} />
+                            <Button title="Eliminar todas las transacción" onPress={deleteAllTransactions} buttonStyle={styles.deleteButton} titleStyle={styles.deleteButtonText} />
                         </>
                     }
                     renderItem={({ item }) => (
                         <View style={styles.transactionContainer}>
-                            <TouchableOpacity onPress={() => navigation.navigate('AddTransactionScreen', { transaction: item })}>
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('AddTransactionsScreen', { transaction: item })}>
                                 <View style={styles.transaction}>
-                                    <Text style={styles.items}>{item.description} ({getCategoryName(item.categoryId)})</Text>
+                                    <Text style={styles.items}>
+                                        {item.description} ({getCategoryName(item.categoryId)})
+                                    </Text>
                                     <Text style={styles.items}>{item.amount}</Text>
                                 </View>
                             </TouchableOpacity>
@@ -223,7 +283,18 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
         color: '#000'
-    }
+    },
+    deleteButton: {
+        backgroundColor: '#FF0000',
+        padding: 10,
+        borderRadius: 5,
+        marginTop: 10,
+        marginBottom: 10,
+    },
+    deleteButtonText: {
+        color: '#FFFFFF', 
+        fontSize: 16,
+    },
 });
 
 export default HomeScreen;
