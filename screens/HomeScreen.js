@@ -231,7 +231,10 @@ const HomeScreen = ({ navigation }) => {
                             </View>
 
                             <Button title="Agregar Transacción" onPress={() => navigation.navigate('AddTransactionsScreen')} />
-                            <Button title="Eliminar todas las transacción" onPress={deleteAllTransactions} buttonStyle={styles.deleteButton} titleStyle={styles.deleteButtonText} />
+                            {
+                                transactions <= 0 ? null :
+                            <Button title="Eliminar todas las transacciones" onPress={deleteAllTransactions} buttonStyle={styles.deleteButton} titleStyle={styles.deleteButtonText} />
+                            }
                         </>
                     }
                     renderItem={({ item }) => (
